@@ -1,6 +1,7 @@
 import React ,{Component} from 'react';
 import {list} from './apiUser';
 import DefaultProfile from '../images/avatar.png';
+import {Link} from 'react-router-dom';
 
 class Users extends Component{
     constructor(){
@@ -32,7 +33,7 @@ class Users extends Component{
                                 <div className="card-body">
                                     <h5 className="card-title">{user.name}</h5>
                                     <p className="card-text">{user.email}</p>
-                                    <a href="#" className="btn btn-primary btn-raised btn-sm">View Profile</a>
+                                    <Link to={`/user/${user._id}`} className="btn btn-primary btn-raised btn-sm">View Profile</Link>
                                 </div>
                             </div>
                 
