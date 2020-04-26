@@ -23,7 +23,15 @@ const userSchema=new mongoose.Schema({
         type: Date,
         default: Date.now//in js we normally use like Date.now() but with mongoose like this     
     },
-    updated: Date
+    updated: Date,
+    photo: {
+        data: Buffer,
+        contentType: String
+    },
+    about:{
+        type: String,
+        trim: true
+    }
 })
  
 userSchema.virtual("password")
