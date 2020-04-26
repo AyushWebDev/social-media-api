@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
-import {read , update} from './apiUser';
+import {read , update , updateUser} from './apiUser';
 import {isAuthenticated} from '../auth';
 import { Redirect, Link } from 'react-router-dom';
+import DefaultProfile from '../images/avatar.png'
 
 class EditProfile extends Component{
     constructor(){
@@ -10,7 +11,9 @@ class EditProfile extends Component{
             id:"",
             name: "",
             email: "",
+            about: "",
             password: "",
+            fileSize: 0,
             redirectToProfile: false,
             error: ""
         }
@@ -28,26 +31,39 @@ class EditProfile extends Component{
                 this.setState({
                     id: data._id,
                     name: data.name,
-                    email: data.email
+                    email: data.email,
+                    about: data.about
                 })
             }
         })
     }
 
     componentDidMount(){
+        this.userData=new FormData();
         const userId=this.props.match.params.userId;
         this.getUser(userId); 
     }
 
     handleChange=name=>event=>{
+        const value= name=== 'photo' ? event.target.files[0] : event.target.value
+        const fileSize=name==='photo'?event.target.files[0].size:0;
+        this.userData.set(name,value);
         this.setState({
-            [name]: event.target.value,
-            error: "" 
+            [name]: value,
+            error: "" ,
+            fileSize
         }); 
     };
 
     isValid=()=>{
-        const {name,email,password}=this.state;
+        const {name,email,password,fileSize}=this.state;
+        if(fileSize>100000){
+            this.setState({
+                error: "File Size should be less than 100kb"
+            })
+            return false
+        }
+
         if(name.length==0)
         {
             this.setState({
@@ -77,34 +93,42 @@ class EditProfile extends Component{
     clickSubmit=event=>{
         event.preventDefault();
         if(this.isValid()){
-            const {name,email,password}=this.state;
+            const {name,email,password,about}=this.state;
             const user={
                 name,    
                 email,
+                about,
                 password: password||undefined
             };
             
             const userId=this.props.match.params.userId;
             const token=isAuthenticated().token;
-            update(userId,token,user)
+            update(userId,token,this.userData)
             .then(data=>{ 
                 if(data.error){
                     this.setState({error: data.error});
                 }
                 else{
-                    this.setState({
-                    redirectToProfile: true
-                    });
+                    updateUser(data,()=>{
+                        this.setState({
+                            redirectToProfile: true
+                            });
+                    })
+                    
                 }
             });
         }
         
     };
 
+   
     render(){
         const {redirectToProfile,id}=this.state;
         if(redirectToProfile)
             return <Redirect to={`/user/${id}`}/>
+        
+        const photoUrl=id?`http://localhost:8080/user/photo/${id}?${new Date().getTime()}`:DefaultProfile;
+
         return(
             <div className="container">
                 <div className="col-md-4"></div>
@@ -118,7 +142,15 @@ class EditProfile extends Component{
                         New Account Has Been Created.Please <Link to="/signin">Sign In</Link>
                     </div>
                     }
+                    
+                    <img src={photoUrl} alt={this.state.name} style={{height: "200px", width: "auto"}} className="img-thumbnail"
+                    onError={i=>{i.target.src=`${DefaultProfile}`}}></img>
+
                     <form>
+                        <div className="form-group">
+                            <label className="text-muted">Profile Photo</label>
+                            <input onChange={this.handleChange("photo")} type="file" accept="image/*" className="form-control"/>
+                        </div>
                         <div className="form-group">
                             <label className="text-muted">Name</label>
                             <input onChange={this.handleChange("name")} type="text" className="form-control" value={this.state.name}/>
@@ -126,6 +158,10 @@ class EditProfile extends Component{
                         <div className="form-group">
                             <label className="text-muted">Email</label>
                             <input onChange={this.handleChange("email")} type="email" className="form-control" value={this.state.email}/>
+                        </div>
+                        <div className="form-group">
+                            <label className="text-muted">About</label>
+                            <textarea onChange={this.handleChange("about")} type="text" className="form-control" value={this.state.about}></textarea>
                         </div>
                         <div className="form-group">
                             <label className="text-muted">Password</label>
