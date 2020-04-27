@@ -4,9 +4,13 @@ const fs=require("fs");
 const _=require("lodash");
 
 exports.userById=(req,res,next,id)=>{
-    User.findById(id).exec((err,user)=>{
+    User.findById(id)
+    //populate followers and following
+    .populate('following','_id name')
+    .populate('followers','_id name')
+    .exec((err,user)=>{
         if(err){
-            return res.status.json({
+            return res.status(400).json({
                 error: "user not found"
             });
         }
@@ -62,7 +66,7 @@ exports.updateUser=(req,res,next)=>{
     form.parse(req,(err,fields,files)=>{
         if(err){
             return res.status(400).json({
-                error: ""
+                error: err
             })
         }
         //save user
@@ -109,4 +113,56 @@ exports.userPhoto=(req,res,next)=>{
         return res.send(req.profile.photo.data);
     }
     next();
+}
+
+//Follow unfollow
+
+exports.addFollowing=(req,res,next)=>{
+    User.findByIdAndUpdate(req.body.userId,{$push: {following: req.body.followId}},(err,result)=>{
+        if(err){
+            return res.status(400).json({error: err});
+        }
+        next();
+    });
+   
+}
+
+exports.addFollower=(req,res,next)=>{
+    User.findByIdAndUpdate(req.body.followId,{$push: {followers: req.body.userId}},{new: true})
+    .populate("following","_id name")
+    .populate("followers","_id name")
+    .exec((err,result)=>{
+        if(err){
+            return res.status(400).json({
+                error: err
+            })
+        }
+        result.hashed_password=undefined;
+        res.json(result);
+    })
+    
+}
+
+exports.removeFollowing=(req,res,next)=>{
+    User.findByIdAndUpdate(req.body.userId,{$pull: {following: req.body.unfollowId}},(err,result)=>{
+        if(err){
+            return res.status(400).json({error: err})
+        }
+        next();
+    })
+}
+
+exports.removeFollower=(req,res,next)=>{
+    User.findByIdAndUpdate(req.body.unfollowId,{$pull: {followers: req.body.userId}},{new: true})
+    .populate("following","_id name")
+    .populate("followers","_id name")
+    .exec((err,result)=>{
+        if(err){
+            return res.status(400).json({
+                error: err
+            })
+        }
+        result.hashed_password=undefined
+        res.json(result);
+    })
 }
