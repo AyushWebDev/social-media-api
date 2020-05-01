@@ -151,7 +151,7 @@ exports.removeFollowing=(req,res,next)=>{
         next();
     })
 }
-
+ 
 exports.removeFollower=(req,res,next)=>{
     User.findByIdAndUpdate(req.body.unfollowId,{$pull: {followers: req.body.userId}},{new: true})
     .populate("following","_id name")
@@ -165,4 +165,15 @@ exports.removeFollower=(req,res,next)=>{
         result.hashed_password=undefined
         res.json(result);
     })
+}
+
+exports.findPeople=(req,res)=>{
+    let following=req.profile.following;
+    following.push(req.profile._id); 
+    User.find({_id: {$nin: following}},(err,result)=>{
+        if(err){
+            return res.status(400).json({error: err})
+        }
+        res.json(result)
+    }).select('name');
 }
