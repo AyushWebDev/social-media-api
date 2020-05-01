@@ -3,7 +3,7 @@ const express=require("express");
 const router=express.Router();  
 
 const {requireSignin}=require("../controller/auth");
-const {userById,allUsers,getUser,updateUser,deleteUser,userPhoto,addFollowing,addFollower,removeFollowing,removeFollower}=require("../controller/user");
+const {userById,allUsers,getUser,updateUser,deleteUser,userPhoto,addFollowing,addFollower,removeFollowing,removeFollower,findPeople}=require("../controller/user");
 //router.get("/",requireSignin,getPosts);
 const postRouters=require("../controller/auth");
 //const validator=require("../validator");
@@ -23,6 +23,9 @@ router.get("/users",allUsers);
 router.get("/user/:userId",requireSignin,getUser);
 router.put("/user/:userId",requireSignin,updateUser);
 router.delete("/user/:userId",requireSignin,deleteUser);
+
+router.get("/user/findPeople/:userId",requireSignin,findPeople);
+
 
 //photo
 router.get("/user/photo/:userId",userPhoto)
