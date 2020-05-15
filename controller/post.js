@@ -31,11 +31,10 @@ exports.getPosts=(req,res)=>{
     
     const posts=Post.find()
     .populate("postedBy","_id name")//as it is refering to different model
-    .select("id title body")//for properties of same model
+    .select("_id title body created")//for properties of same model
+    .sort({created: -1})
     .then((posts)=>{
-        res.status(200).json({
-            posts: posts
-        });
+        res.status(200).json(posts);
     })
     .catch((err)=>{
         console.log(err);
@@ -138,3 +137,7 @@ exports.updatePost=(req,res)=>{
     });
 };
 
+exports.postPhoto=(req,res)=>{
+    res.set("Content-Type",req.post.photo.contentType);
+    return res.send(req.post.photo.data);
+}
