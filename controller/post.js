@@ -31,7 +31,7 @@ exports.getPosts=(req,res)=>{
     
     const posts=Post.find()
     .populate("postedBy","_id name")//as it is refering to different model
-    .select("_id title body created")//for properties of same model
+    .select("_id title body created likes")//for properties of same model
     .sort({created: -1})
     .then((posts)=>{
         res.status(200).json(posts);
@@ -95,9 +95,14 @@ exports.createPost=(req,res,next)=>{
     
 };
 
+exports.singlePost = (req,res)=>{
+    return res.json(req.post);
+}
+
 exports.postsByUser=(req,res)=>{
     Post.find({postedBy: req.profile._id})
     .populate("postedBy","_id name")
+    .select("_id title body created likes")
     .sort("created")
     .exec((err,posts)=>{
         if(err){
@@ -105,7 +110,7 @@ exports.postsByUser=(req,res)=>{
                 error: err
             })
         }
-        res.json({posts});
+        res.json(posts);
     });
 };
 
@@ -123,21 +128,77 @@ exports.deletePost=(req,res)=>{
     });
 };
 
-exports.updatePost=(req,res)=>{
-    let post=req.post;
-    post =_.extend(post,req.body);
+// exports.updatePost=(req,res)=>{
+//     let post=req.post;
+//     post =_.extend(post,req.body);
     
-    post.save((err)=>{
+//     post.save((err)=>{
+//         if(err){
+//             return res.status(400).json({
+//                 error: err
+//             });
+//         }
+//         res.json(post);
+//     });
+// };
+
+exports.updatePost=(req,res,next)=>{
+    let form=new formidable.IncomingForm();
+    form.keepExtensions=true;
+    form.parse(req,(err,fields,files)=>{
         if(err){
             return res.status(400).json({
                 error: err
-            });
+            })
         }
-        res.json(post);
-    });
-};
+        //save user
+        let post=req.post;
+        post=_.extend(post,fields);
+        post.updated=Date.now()
+
+        if(files.photo){
+            post.photo.data=fs.readFileSync(files.photo.path)
+            post.photo.contentType=files.photo.type
+        }
+
+        post.save((err,result)=>{
+            if(err){
+                return res.status(400).json({
+                    error: err
+                })
+            }
+            
+            res.json(post);
+        })
+    })
+
+}
 
 exports.postPhoto=(req,res)=>{
     res.set("Content-Type",req.post.photo.contentType);
     return res.send(req.post.photo.data);
+}
+
+exports.like=(req,res,next)=>{
+    Post.findByIdAndUpdate(req.body.postId,{$push: {likes: req.body.userId}},{new: true})
+    .exec((err,result)=>{
+        if(err)
+        return res.status(400).json({
+            error: err
+        })
+        else
+        return res.json(result);
+    })
+}
+
+exports.unlike=(req,res)=>{
+    Post.findByIdAndUpdate(req.body.postId,{$pull: {likes: req.body.userId}},{new: true})
+    .exec((err,result)=>{
+        if(err)
+        return res.status(400).json({
+            error: err
+        })
+        else
+            return res.json(result);
+    })
 }
