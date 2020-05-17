@@ -1,12 +1,17 @@
 const express=require("express");
   
 const router=express.Router();
-const {postById,isPoster,getPosts,createPost,postsByUser,deletePost,updatePost,postPhoto}=require("../controller/post");
+const {postById,isPoster,getPosts,createPost,postsByUser,deletePost,updatePost,postPhoto,singlePost,like,unlike}=require("../controller/post");
 const {requireSignin}=require("../controller/auth");
 const {userById}=require("../controller/user");
 const {createPostValidator}=require("../validator");
 //const {userById,allUsers}=require("../controller/user");
 router.get("/posts",requireSignin,getPosts);
+
+router.put("/post/like",requireSignin,like);
+router.put("/post/unlike",requireSignin,unlike);
+
+router.get("/post/:postId",requireSignin,singlePost);
 router.get("/posts/by/:userId",requireSignin,postsByUser);
 router.post("/post/new/:userId",requireSignin,createPost,createPostValidator);
 router.delete("/post/:postId",requireSignin,isPoster,deletePost);
