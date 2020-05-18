@@ -2,7 +2,9 @@ import React , {Component} from 'react';
 import {singlePost,removePost,like,unlike} from './apiPost';
 import {isAuthenticated} from '../auth';
 import DefaultPost from '../images/defaultPost.png';
+
 import {Link, Redirect} from 'react-router-dom';
+import Comment from './Comment';
 
 class SinglePost extends Component{
     constructor(){
@@ -11,7 +13,8 @@ class SinglePost extends Component{
             post: "",
             deleted: false,
             like: false,
-            likes: 0
+            likes: 0,
+            comments: []
         }
     }
 
@@ -24,14 +27,20 @@ class SinglePost extends Component{
                 console.log(data.error);
             else
             {
+                
                 this.setState({
                     post: data,
                     likes: data.likes.length,
-                    like: this.checkLike(data.likes)
+                    like: this.checkLike(data.likes),
+                    comments: data.comments
                 })
             }
                 
         })
+    }
+
+    updateComment=comment=>{
+        this.setState({comments: comment})
     }
 
     checkLike=(likes)=>{
@@ -84,7 +93,10 @@ class SinglePost extends Component{
     renderPost=(post)=>{
                             const posterId=post.postedBy? post.postedBy._id : ""
                             const posterName=post.postedBy? post.postedBy.name : ""
-                            const {likes}=this.state;
+                            const {likes,comments}=this.state;
+                            
+                            const user=isAuthenticated().user;
+                            
                             
                             return (
                             <div className="card mt-4 mb-4 mr-3 ml-3"  style={{width: "100%"}}>
@@ -117,6 +129,9 @@ class SinglePost extends Component{
                                         </>
                                         }
                                     </div>
+                                    
+                                    <Comment postId={post._id} user={isAuthenticated().user} userId={isAuthenticated().user._id} token={isAuthenticated().token} updateComment={this.updateComment} comments={comments}/>
+                                   
                                 </div>
                             </div>
                             )
@@ -127,10 +142,13 @@ class SinglePost extends Component{
         if(this.state.deleted)
             return <Redirect to="/" />
         return(
+            <>
         <div className="container">
             <h2 className="mt-5 mb-5">{post.title}</h2>
             {this.renderPost(post)}
         </div>
+       
+        </>
         )
     }
 }
