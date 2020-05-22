@@ -11,6 +11,7 @@ class NewPost extends Component{
             title: "",
             body: "",
             photo: "",
+            video:"",
             error: "",
             user:{},
             fileSize: 0,
@@ -25,7 +26,7 @@ class NewPost extends Component{
     handleChange=name=>event=>{
         this.setState({error: ""});
 
-        const value=name=="photo" ? event.target.files[0] : event.target.value;
+        const value=name=="photo" || name=="video" ? event.target.files[0] : event.target.value;
         const fileSize= name=="photo" ? event.target.files[0].size : 0;
 
         this.postData.set(name , value);
@@ -99,6 +100,10 @@ class NewPost extends Component{
                         <div className="form-group">
                             <label className="text-muted">Photo</label>
                             <input className="form-control" type="file" accept="image/*" onChange={this.handleChange("photo")}></input>
+                        </div>
+                        <div className="form-group">
+                            <label className="text-muted">Video</label>
+                            <input className="form-control" type="file" accept="video/*" onChange={this.handleChange("video")}></input>
                         </div>
                         <div className="form-group">
                             <label className="text-muted">Title</label>

@@ -2,7 +2,7 @@ import React , {Component} from 'react';
 import {singlePost,removePost,like,unlike} from './apiPost';
 import {isAuthenticated} from '../auth';
 import DefaultPost from '../images/defaultPost.png';
-
+import DefaultVid from '../images/defvid.mp4';
 import {Link, Redirect} from 'react-router-dom';
 import Comment from './Comment';
 
@@ -99,7 +99,9 @@ class SinglePost extends Component{
                             
                             
                             return (
-                            <div className="card mt-4 mb-4 mr-3 ml-3"  style={{width: "100%"}}>
+                                <div className="container">
+                                
+                            <div className="card mt-3 mr-5 ml-5">
                                 
                                 <div className="card-body">
                                     <img
@@ -109,6 +111,16 @@ class SinglePost extends Component{
                                         className="img-thumbnail mb-3"
                                         style={{width: "100%" , objectFit: "cover"}}
                                     ></img>
+                                     <video controls
+                                        style={{width: "100%" , objectFit: "cover"}}
+                                        className="img-thumbnail mb-3 mt-3"
+                                        src={`http://localhost:8080/post/video/${post._id}`}
+                                        onError={i=>i.target.src=`${DefaultVid}`}
+                                    >
+                                    
+                                    
+                                    Your browser does not support the tag
+                                    </video> 
 
                                     {likes ? (<h5 onClick={this.likeToggle}><i className="fa fa-thumbs-up text-primary bg-dark" style={{padding: "10px",borderRadius:"50%"}}></i> {likes} Like</h5>)
                                     : (<h5 onClick={this.likeToggle}><i className="fa fa-thumbs-up" style={{padding: "10px",borderRadius:"50%"}}></i> {likes} Like</h5>)
@@ -133,6 +145,7 @@ class SinglePost extends Component{
                                     <Comment postId={post._id} user={isAuthenticated().user} userId={isAuthenticated().user._id} token={isAuthenticated().token} updateComment={this.updateComment} comments={comments}/>
                                    
                                 </div>
+                            </div>
                             </div>
                             )
     }
