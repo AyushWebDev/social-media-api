@@ -3,6 +3,7 @@ const formidable=require("formidable");
 const fs=require("fs");
 const _=require("lodash");
 
+
 exports.postById=(req,res,next,id)=>{
     Post.findById(id) 
     .populate("postedBy","_id name")
@@ -61,9 +62,19 @@ exports.createPost=(req,res,next)=>{
         post.postedBy=req.profile;//adding user to post
 
         if(files.photo){
+            
+
             post.photo.data= fs.readFileSync(files.photo.path);
             post.photo.contentType= files.photo.type;
         }
+
+        if(files.video)
+        {
+            post.video.data=fs.readFileSync(files.video.path)
+            post.video.contentType=files.video.type
+            
+        }
+
 
         post.save((err,result)=>{
             if(err)
@@ -165,6 +176,7 @@ exports.updatePost=(req,res,next)=>{
             post.photo.contentType=files.photo.type
         }
 
+        
         post.save((err,result)=>{
             if(err){
                 return res.status(400).json({
@@ -179,8 +191,14 @@ exports.updatePost=(req,res,next)=>{
 }
 
 exports.postPhoto=(req,res)=>{
-    res.set("Content-Type",req.post.photo.contentType);
-    return res.send(req.post.photo.data);
+     res.set("Content-Type",req.post.photo.contentType);
+     return res.send(req.post.photo.data);
+   
+    
+}
+exports.postVideo=(req,res)=>{
+    res.set("Content-Type",req.post.video.contentType);
+    return res.send(req.post.video.data);
 }
 
 exports.like=(req,res,next)=>{
