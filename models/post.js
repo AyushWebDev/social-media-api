@@ -21,6 +21,10 @@ const postSchema=new mongoose.Schema({
         data: Buffer,
         contentType: String//image info,file format etc
     },
+    video:{
+        data: Buffer,
+        contentType: String//image info,file format etc
+    },
     postedBy: {
         type: ObjectId,
         ref: "User"
