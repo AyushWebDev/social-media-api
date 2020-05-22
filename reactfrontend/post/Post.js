@@ -1,7 +1,7 @@
 import React ,{Component} from 'react';
 import {list} from './apiPost';
 import DefaultPost from '../images/defaultPost.png';
-import DefaultVid from '../images/defvid.mp4';
+import DefaultVid from '../images/defvid2.mp4';
 import {Link} from 'react-router-dom';
 import {isAuthenticated} from '../auth';
 
@@ -51,7 +51,7 @@ class Posts extends Component{
                                         style={{width: "18rem"}}
                                         className="img-thumbnail mb-3 mt-3"
                                         src={`http://localhost:8080/post/video/${post._id}`}
-                                        onError={i=>i.target.src=""}
+                                        onError={i=>i.target.src=`${DefaultVid}`}
                                     >
                                     
                                     
