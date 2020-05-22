@@ -176,6 +176,11 @@ exports.updatePost=(req,res,next)=>{
             post.photo.contentType=files.photo.type
         }
 
+        if(files.video){
+            post.video.data=fs.readFileSync(files.video.path)
+            post.video.contentType=files.video.type
+        }
+
         
         post.save((err,result)=>{
             if(err){
