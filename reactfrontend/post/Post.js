@@ -37,7 +37,7 @@ class Posts extends Component{
                             const dotted=post.body.length<20 ? "" : "........"
                             
                             return (
-                            <div className="card col-md-3 mt-4 mb-4 mr-3 ml-3" style={{width: "18rem"}} key={i}>
+                            <div className="card col-md-5 mt-4 mb-4 mr-3 ml-3" key={i}>
                                 
                                 <div className="card-body">
                                     <img
@@ -48,7 +48,7 @@ class Posts extends Component{
                                         style={{height: "auto", objectFit: "cover"}}
                                     ></img>
                                     { <video controls
-                                        style={{width: "18rem"}}
+                                        style={{objectFit: "cover"}}
                                         className="img-thumbnail mb-3 mt-3"
                                         src={`http://localhost:8080/post/video/${post._id}`}
                                         onError={i=>i.target.src=`${DefaultVid}`}
