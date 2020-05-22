@@ -3,6 +3,7 @@ import {singlePost,update} from './apiPost';
 import {isAuthenticated} from '../auth';
 import { Redirect, Link } from 'react-router-dom';
 import DefaultPost from '../images/defaultPost.png';
+import DefaultVid from '../images/defvid.mp4';
 
 class EditPost extends Component{
     constructor(){
@@ -40,7 +41,7 @@ class EditPost extends Component{
     handleChange=name=>event=>{
         this.setState({error: ""});
 
-        const value=name=="photo" ? event.target.files[0] : event.target.value;
+        const value=name=="photo" || name=="video"? event.target.files[0] : event.target.value;
         const fileSize= name=="photo" ? event.target.files[0].size : 0;
 
         this.postData.set(name , value);
@@ -71,6 +72,7 @@ class EditPost extends Component{
                         title: "",
                         body: "",
                         photo: "",
+                        video: "",
                         redirectToProfile: true
                     })
                 }
@@ -126,10 +128,21 @@ class EditPost extends Component{
                         className="img-thumbnail mb-3"
                         style={{width: "auto" , objectFit: "cover"}}
                         ></img>
+                        <video
+                        src={`http://localhost:8080/post/video/${this.state.id}?${new Date().getTime()}`}
+                        alt={title}
+                        // onError={(event)=>event.target.src=`${DefaultVid}`}
+                        className="img-thumbnail mb-3"
+                        style={{width: "auto" , objectFit: "cover"}}
+                        ></video>
                     <form>
                         <div className="form-group">
                             <label className="text-muted">Photo</label>
                             <input className="form-control" type="file" accept="image/*" onChange={this.handleChange("photo")}></input>
+                        </div>
+                        <div className="form-group">
+                            <label className="text-muted">Video</label>
+                            <input className="form-control" type="file" accept="video/*" onChange={this.handleChange("video")}></input>
                         </div>
                         <div className="form-group">
                             <label className="text-muted">Title</label>

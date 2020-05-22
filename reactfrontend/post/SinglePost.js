@@ -115,7 +115,7 @@ class SinglePost extends Component{
                                         style={{width: "100%" , objectFit: "cover"}}
                                         className="img-thumbnail mb-3 mt-3"
                                         src={`http://localhost:8080/post/video/${post._id}`}
-                                        onError={i=>i.target.src=`${DefaultVid}`}
+                                        // onError={i=>i.target.src=`${DefaultVid}`}
                                     >
                                     
                                     
